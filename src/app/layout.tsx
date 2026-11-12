@@ -17,8 +17,8 @@ const geistMono = Geist_Mono({
 // প্রিমিয়াম ও এসইও ফ্রেন্ডলি মেটাডেটা
 export const metadata: Metadata = {
   title: {
-    template: "%s | DocFlow AI",
-    default: "DocFlow AI — Premium Collaborative Workspace",
+    template: "%s |  Ajaia Docs",
+    default: "Ajaia Docs — Premium Collaborative Workspace",
   },
   description:
     "An elite, lightning-fast collaborative document editor built for high-performance teams.",
@@ -29,12 +29,12 @@ export const metadata: Metadata = {
     "Collaborative Editor",
     "Aesthetic Docs",
   ],
-  authors: [{ name: "Your Name" }],
+  authors: [{ name: "Mahmudul Hasan Nirab" }],
   openGraph: {
-    title: "DocFlow AI — Premium Collaborative Workspace",
+    title: "Ajaia Docs — Premium Collaborative Workspace",
     description: "Experience the next-gen aesthetic document editor.",
-    url: "https://yourdomain.com",
-    siteName: "DocFlow AI",
+    url: "https://ajaia-docs-gamma-two.vercel.app",
+    siteName: "Ajaia Docs",
     locale: "en_US",
     type: "website",
   },

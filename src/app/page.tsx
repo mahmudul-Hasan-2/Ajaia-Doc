@@ -10,7 +10,6 @@ export default function AuthPage() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
-  const [demoUsers, setDemoUsers] = useState<any[]>([]);
   const router = useRouter();
 
   useEffect(() => {
@@ -19,13 +18,7 @@ export default function AuthPage() {
       router.push("/dashboard");
       return;
     }
-    fetchDemoUsers();
   }, [router]);
-
-  async function fetchDemoUsers() {
-    const { data } = await supabase.from("users").select("*").limit(3);
-    if (data) setDemoUsers(data);
-  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -60,7 +53,7 @@ export default function AuthPage() {
         router.push("/dashboard");
       }
     } else {
-      // ২. ইমেইল দিয়ে লগইন (Login)
+      // ২. ইমেইল দিয়ে লগইন (Login)
       const { data, error } = await supabase
         .from("users")
         .select("*")
@@ -78,23 +71,18 @@ export default function AuthPage() {
     setLoading(false);
   };
 
-  const handleQuickLogin = (user: any) => {
-    localStorage.setItem("ajaia_user", JSON.stringify(user));
-    router.push("/dashboard");
-  };
-
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 p-4">
-      <div className="w-full max-w-md rounded-xl bg-white p-8 shadow-md border border-gray-100">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-[#f8f9fa] p-4">
+      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-sm border border-gray-200">
         <h1 className="text-2xl font-bold text-gray-900">Ajaia Docs</h1>
         <p className="mt-1 mb-6 text-sm text-gray-500">
           {isRegister
             ? "Create a new workspace account"
-            : "Sign in to your workspace"}
+            : "Sign in to your private workspace"}
         </p>
 
         {errorMsg && (
-          <div className="mb-4 rounded-lg bg-red-50 p-3 text-xs text-red-600 border border-red-200">
+          <div className="mb-4 rounded-xl bg-red-50 p-3 text-xs text-red-600 border border-red-200">
             {errorMsg}
           </div>
         )}
@@ -110,7 +98,7 @@ export default function AuthPage() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder="e.g. John Doe"
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none"
+                className="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none transition-all"
               />
             </div>
           )}
@@ -124,7 +112,7 @@ export default function AuthPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
-              className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none"
+              className="w-full rounded-xl border border-gray-300 px-3.5 py-2.5 text-sm text-gray-900 focus:border-blue-600 focus:outline-none transition-all"
               required
             />
           </div>
@@ -132,7 +120,7 @@ export default function AuthPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded-lg bg-blue-600 py-2.5 text-sm font-medium text-white hover:bg-blue-700 transition disabled:opacity-50"
+            className="w-full rounded-xl bg-blue-600 py-2.5 text-sm font-medium text-white hover:bg-blue-700 transition-all shadow-sm active:scale-[0.99] disabled:opacity-50"
           >
             {loading
               ? "Please wait..."
@@ -142,7 +130,7 @@ export default function AuthPage() {
           </button>
         </form>
 
-        <div className="mt-4 text-center">
+        <div className="mt-5 text-center">
           <button
             type="button"
             onClick={() => {
@@ -156,28 +144,6 @@ export default function AuthPage() {
               : "Don't have an account? Register"}
           </button>
         </div>
-
-        {/* One-Click Demo Accounts for Reviewers */}
-        {demoUsers.length > 0 && (
-          <div className="mt-6 border-t pt-5">
-            <p className="mb-3 text-xs font-medium text-gray-400 uppercase tracking-wider">
-              Quick Reviewer Login
-            </p>
-            <div className="space-y-2">
-              {demoUsers.map((user) => (
-                <button
-                  key={user.id}
-                  type="button"
-                  onClick={() => handleQuickLogin(user)}
-                  className="w-full flex items-center justify-between rounded-lg border border-gray-200 px-3 py-2 text-left text-xs hover:bg-gray-50 transition"
-                >
-                  <span className="font-medium text-gray-800">{user.name}</span>
-                  <span className="text-gray-500">{user.email} &rarr;</span>
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );

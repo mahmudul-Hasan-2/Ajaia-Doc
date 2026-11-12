@@ -1,4 +1,4 @@
-# 🚀 DocFlow AI — Premium Collaborative Document Editor
+# 🚀 Ajaia docs — Premium Collaborative Document Editor
 
 An elite, lightning-fast collaborative document workspace built with Next.js (App Router), Tailwind CSS, TypeScript, Tiptap Rich-Text Editor, and Supabase.
 
