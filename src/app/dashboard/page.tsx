@@ -13,14 +13,45 @@ export default function DashboardPage() {
   const router = useRouter();
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("ajaia_user");
-    if (!storedUser) {
-      router.push("/");
-      return;
+    async function verifyAndLoadUser() {
+      const storedUser = localStorage.getItem("ajaia_user");
+      if (!storedUser) {
+        router.push("/");
+        return;
+      }
+
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        if (!parsedUser?.id) {
+          localStorage.removeItem("ajaia_user");
+          router.push("/");
+          return;
+        }
+
+        // Supabase ডাটাবেসে ইউজার রিয়েল-টাইম ভ্যালিডেশন
+        const { data: dbUser, error } = await supabase
+          .from("users")
+          .select("*")
+          .eq("id", parsedUser.id)
+          .single();
+
+        if (error || !dbUser) {
+          // যদি ডাটাবেসে ইউজার না থাকে, তবে লগআউট করে হোমপেজে পাঠাবে
+          localStorage.removeItem("ajaia_user");
+          router.push("/");
+          return;
+        }
+
+        setUser(dbUser);
+        fetchDocuments(dbUser.id);
+      } catch (err) {
+        console.error("Auth verification error:", err);
+        localStorage.removeItem("ajaia_user");
+        router.push("/");
+      }
     }
-    const parsedUser = JSON.parse(storedUser);
-    setUser(parsedUser);
-    fetchDocuments(parsedUser.id);
+
+    verifyAndLoadUser();
   }, [router]);
 
   async function fetchDocuments(userId: string) {
@@ -34,7 +65,7 @@ export default function DashboardPage() {
         .order("updated_at", { ascending: false });
       if (owned) setOwnedDocs(owned);
 
-      // ২. শেয়ার করা ডকুমেন্ট ফেচ করা
+      // ২. শেয়ার করা ডকুমেন্ট ফেচ করা
       const { data: shares } = await supabase
         .from("document_shares")
         .select("document_id, documents(*)")
@@ -67,7 +98,7 @@ export default function DashboardPage() {
   };
 
   const deleteDocument = async (e: React.MouseEvent, docId: string) => {
-    e.stopPropagation(); // যাতে কার্ডে ক্লিক হয়ে এডিটর পেজে না চলে যায়
+    e.stopPropagation(); // যাতে কার্ডে ক্লিক হয়ে এডিটর পেজে না চলে যায়
     if (!confirm("Are you sure you want to delete this document?")) return;
 
     const { error } = await supabase.from("documents").delete().eq("id", docId);
@@ -83,7 +114,13 @@ export default function DashboardPage() {
     router.push("/");
   };
 
-  if (!user) return null;
+  if (!user) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50 text-sm text-gray-500">
+        Verifying session...
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
@@ -167,6 +204,7 @@ export default function DashboardPage() {
                   onClick={() => router.push(`/documents/${doc.id}`)}
                   className="bg-white p-4 rounded-xl border border-gray-200 hover:shadow-md cursor-pointer transition flex items-start gap-3"
                 >
+                  localStorage.setItem("ajaia_user", JSON.stringify(dbUser));
                   <Share2 className="text-purple-600 mt-1" size={20} />
                   <div>
                     <h3 className="font-semibold text-gray-800">{doc.title}</h3>
