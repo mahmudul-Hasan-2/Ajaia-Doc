@@ -13,11 +13,38 @@ export default function AuthPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // যদি আগে থেকেই লগইন করা থাকে, সরাসরি ড্যাশবোর্ডে পাঠাবে
-    if (localStorage.getItem("ajaia_user")) {
-      router.push("/dashboard");
-      return;
+    async function verifyExistingSession() {
+      const storedUser = localStorage.getItem("ajaia_user");
+      if (!storedUser) return;
+
+      try {
+        const parsedUser = JSON.parse(storedUser);
+        if (!parsedUser?.id) {
+          localStorage.removeItem("ajaia_user");
+          return;
+        }
+
+        // Supabase ডাটাবেসে ইউজার রিয়েল-টাইম ভ্যালিডেশন
+        const { data: dbUser, error } = await supabase
+          .from("users")
+          .select("*")
+          .eq("id", parsedUser.id)
+          .single();
+
+        if (error || !dbUser) {
+          // যদি ডাটাবেসে ইউজার না থাকে, তবে লোকালস্টোরেজ থেকে রিমুভ করে দেবে
+          localStorage.removeItem("ajaia_user");
+        } else {
+          // ইউজার সত্যিকೆಯೇ থাকলে সরাসরি ড্যাশবোর্ডে পাঠাবে
+          router.push("/dashboard");
+        }
+      } catch (err) {
+        console.error("Session verification error:", err);
+        localStorage.removeItem("ajaia_user");
+      }
     }
+
+    verifyExistingSession();
   }, [router]);
 
   const handleSubmit = async (e: React.FormEvent) => {

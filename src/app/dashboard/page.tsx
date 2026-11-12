@@ -204,7 +204,6 @@ export default function DashboardPage() {
                   onClick={() => router.push(`/documents/${doc.id}`)}
                   className="bg-white p-4 rounded-xl border border-gray-200 hover:shadow-md cursor-pointer transition flex items-start gap-3"
                 >
-                  localStorage.setItem("ajaia_user", JSON.stringify(dbUser));
                   <Share2 className="text-purple-600 mt-1" size={20} />
                   <div>
                     <h3 className="font-semibold text-gray-800">{doc.title}</h3>
